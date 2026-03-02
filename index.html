@@ -1,512 +1,694 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crime in San Francisco 2003–2025</title>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crime in San Francisco 2003–2025</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cream: #f5f0e8;
+      --ink: #1a1510;
+      --mid: #5a5044;
+      --accent: #c0392b;
+      --accent2: #2c7a4b;
+      --rule: #c8bfb0;
+      --highlight: #fff3cd;
+    }
 
-        body {
-            font-family: 'Source Sans 3', sans-serif;
-            font-weight: 300;
-            color: #222;
-            background: #fff;
-            line-height: 1.8;
-        }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* ── COVER ── */
-        .cover {
-            width: 100%;
-            height: 100vh;
-            min-height: 500px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 60px 80px;
-            overflow: hidden;
-        }
+    html { scroll-behavior: smooth; }
 
-        .cover-img {
-            position: absolute;
-            inset: 0;
-            background-image: url('cover.JPG');
-            background-size: cover;
-            background-position: center center;
-        }
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 300;
+      font-size: 17px;
+      line-height: 1.75;
+    }
 
-        /* dark gradient from bottom so text is readable */
-        .cover-img::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(
-                to bottom,
-                rgba(0,0,0,0.15) 0%,
-                rgba(0,0,0,0.3) 40%,
-                rgba(0,0,0,0.75) 100%
-            );
-        }
+    /* ── HEADER ── */
+    header {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 64px 32px 52px;
+    }
+    .header-eyebrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #9e9282;
+      margin-bottom: 20px;
+    }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      font-weight: 400;
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+      margin-bottom: 24px;
+    }
+    header h1 em {
+      font-style: italic;
+      color: #e8a090;
+    }
+    .header-sub {
+      font-size: 15px;
+      color: #9e9282;
+      font-weight: 300;
+      margin-bottom: 36px;
+    }
+    .authors {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+    .author-chip {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 3px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: #c8bfb0;
+    }
+    .author-chip span {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: #9e9282;
+      display: block;
+      margin-top: 1px;
+    }
 
-        .cover-content {
-            position: relative;
-            z-index: 1;
-            max-width: 800px;
-        }
+    /* ── NAV ── */
+    nav {
+      background: #111;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid #2a2520;
+    }
+    nav ul {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 32px;
+      display: flex;
+      gap: 0;
+      list-style: none;
+    }
+    nav ul li a {
+      display: block;
+      padding: 14px 18px;
+      text-decoration: none;
+      color: #9e9282;
+      font-size: 13px;
+      font-family: 'IBM Plex Mono', monospace;
+      letter-spacing: 0.05em;
+      transition: color 0.2s;
+      border-bottom: 2px solid transparent;
+    }
+    nav ul li a:hover {
+      color: var(--cream);
+      border-bottom-color: var(--accent);
+    }
 
-        .cover-label {
-            font-size: 12px;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.65);
-            margin-bottom: 16px;
-        }
+    /* ── MAIN ── */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 32px 80px;
+    }
 
-        .cover h1 {
-            font-family: 'Merriweather', serif;
-            font-size: clamp(30px, 5vw, 62px);
-            font-weight: 700;
-            color: #fff;
-            line-height: 1.15;
-            margin-bottom: 16px;
-        }
+    /* ── SECTION ── */
+    .section {
+      padding-top: 72px;
+    }
+    .section-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 400;
+      line-height: 1.2;
+      margin-bottom: 6px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .section-intro {
+      color: var(--mid);
+      font-size: 15.5px;
+      margin: 18px 0 32px;
+      max-width: 680px;
+    }
 
-        .cover h1 em {
-            font-weight: 300;
-            font-style: italic;
-        }
+    /* ── DATASET INTRO ── */
+    #intro {
+      padding-top: 64px;
+    }
+    #intro p {
+      margin-bottom: 18px;
+      max-width: 700px;
+    }
+    .crime-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 24px 0 32px;
+    }
+    .crime-tag {
+      background: var(--ink);
+      color: var(--cream);
+      font-size: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      padding: 5px 12px;
+      border-radius: 2px;
+    }
 
-        .cover-desc {
-            font-size: 17px;
-            color: rgba(255,255,255,0.75);
-            max-width: 560px;
-            line-height: 1.7;
-            margin-bottom: 28px;
-        }
+    /* ── FIGURE BOX ── */
+    .figure-box {
+      background: #fff;
+      border: 1px solid var(--rule);
+      border-left: 4px solid var(--accent);
+      border-radius: 2px;
+      margin: 32px 0 16px;
+      overflow: hidden;
+    }
+    .figure-box .fig-placeholder {
+      background: #f0ece4;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--mid);
+      font-size: 14px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .figure-box .fig-placeholder .fig-icon {
+      font-size: 40px;
+      opacity: 0.35;
+    }
+    .figure-box .fig-placeholder img {
+      max-width: 100%;
+      display: block;
+    }
+    .figure-box .fig-caption {
+      padding: 12px 18px;
+      font-size: 13.5px;
+      color: var(--mid);
+      font-style: italic;
+    }
+    .figure-box .fig-caption strong {
+      font-style: normal;
+      font-weight: 500;
+      color: var(--ink);
+    }
 
-        .cover-authors {
-            font-size: 13px;
-            color: rgba(255,255,255,0.5);
-            letter-spacing: 0.05em;
-        }
+    /* ── ANALYSIS BLOCK ── */
+    .analysis {
+      margin: 28px 0;
+    }
+    .analysis p {
+      margin-bottom: 16px;
+      max-width: 720px;
+    }
+    .analysis h4 {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 500;
+      font-size: 15px;
+      margin: 24px 0 8px;
+      color: var(--ink);
+    }
+    .analysis h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 400;
+      margin: 36px 0 12px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--rule);
+    }
 
-        /* ── NAV ── */
-        nav {
-            background: #fff;
-            border-bottom: 1px solid #e8e8e8;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-        }
+    /* callout */
+    .callout {
+      background: var(--highlight);
+      border-left: 3px solid #e6a817;
+      padding: 14px 18px;
+      margin: 24px 0;
+      font-size: 15px;
+      max-width: 700px;
+      border-radius: 2px;
+    }
 
-        nav a {
-            font-size: 12px;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: #666;
-            text-decoration: none;
-            padding: 18px 32px;
-            border-right: 1px solid #eee;
-            transition: color 0.2s, background 0.2s;
-        }
+    /* ── HEATMAP TABLE ── */
+    .heatmap-note {
+      font-size: 13px;
+      color: var(--mid);
+      font-family: 'IBM Plex Mono', monospace;
+      margin-bottom: 8px;
+    }
 
-        nav a:first-child { border-left: 1px solid #eee; }
-        nav a:hover { color: #111; background: #f7f7f7; }
+    /* ── STATS ROW ── */
+    .stat-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin: 28px 0;
+    }
+    .stat-card {
+      flex: 1;
+      min-width: 140px;
+      background: var(--ink);
+      color: var(--cream);
+      padding: 20px 22px;
+      border-radius: 3px;
+    }
+    .stat-card .stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: #e8a090;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-card .stat-label {
+      font-size: 12px;
+      color: #9e9282;
+      font-family: 'IBM Plex Mono', monospace;
+    }
 
-        /* ── CONTENT ── */
-        .content {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 80px 24px 100px;
-        }
+    /* ── TABLE ── */
+    .contrib-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 14px;
+    }
+    .contrib-table th {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 10px 16px;
+      text-align: left;
+      font-weight: 500;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .contrib-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .contrib-table tr:last-child td {
+      border-bottom: none;
+    }
+    .contrib-table code {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      background: #ede8de;
+      padding: 2px 6px;
+      border-radius: 2px;
+    }
 
-        .section {
-            margin-bottom: 80px;
-        }
+    /* ── REFERENCES ── */
+    .references {
+      margin-top: 72px;
+      padding-top: 32px;
+      border-top: 2px solid var(--ink);
+    }
+    .references h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+    }
+    .references ol {
+      padding-left: 20px;
+    }
+    .references li {
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: var(--mid);
+      line-height: 1.6;
+    }
+    .references a {
+      color: var(--accent);
+    }
 
-        .section-tag {
-            font-size: 11px;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            color: #b0a090;
-            margin-bottom: 10px;
-        }
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      color: #9e9282;
+      text-align: center;
+      padding: 28px 32px;
+      font-size: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
 
-        h2 {
-            font-family: 'Merriweather', serif;
-            font-size: 30px;
-            font-weight: 700;
-            line-height: 1.25;
-            margin-bottom: 28px;
-            color: #111;
-        }
+    hr.section-rule {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 56px 0 0;
+    }
 
-        h3 {
-            font-family: 'Merriweather', serif;
-            font-size: 18px;
-            font-weight: 400;
-            font-style: italic;
-            color: #444;
-            margin: 36px 0 12px;
-        }
-
-        p {
-            font-size: 17px;
-            line-height: 1.9;
-            color: #444;
-            margin-bottom: 20px;
-        }
-
-        strong { color: #111; font-weight: 600; }
-
-        /* ── QUESTION BOX ── */
-        .question {
-            border-left: 3px solid #c8a97a;
-            padding: 14px 20px;
-            background: #faf8f5;
-            margin-bottom: 36px;
-            font-size: 15px;
-            color: #666;
-            font-style: italic;
-            line-height: 1.75;
-        }
-
-        /* ── FIGURE ── */
-        .figure {
-            margin: 36px 0 40px;
-        }
-
-        .figure img {
-            width: 100%;
-            display: block;
-            border: 1px solid #eee;
-        }
-
-        .figure-placeholder {
-            width: 100%;
-            height: 340px;
-            background: #f6f6f6;
-            border: 1px dashed #d0d0d0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            color: #bbb;
-            font-size: 13px;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .figure-placeholder span:first-child { font-size: 32px; opacity: 0.4; }
-
-        .figure-caption {
-            margin-top: 10px;
-            font-size: 13px;
-            color: #999;
-            line-height: 1.65;
-            font-style: italic;
-        }
-
-        .figure-caption strong { color: #666; font-style: normal; }
-
-        /* ── CRIMES LIST ── */
-        .crimes-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 20px 0 28px;
-        }
-
-        .crime-tag {
-            font-size: 12px;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            padding: 6px 16px;
-            border: 1px solid #ddd;
-            color: #666;
-            background: #fafafa;
-        }
-
-        /* ── DIVIDER ── */
-        hr {
-            border: none;
-            border-top: 1px solid #ececec;
-            margin: 70px 0;
-        }
-
-        /* ── FOOTER ── */
-        footer {
-            background: #111;
-            color: #888;
-            text-align: center;
-            padding: 48px 24px;
-            font-size: 13px;
-            line-height: 2;
-        }
-
-        footer span { color: #555; }
-    </style>
+    strong { font-weight: 500; }
+  </style>
 </head>
 <body>
 
-<!-- COVER -->
-<div class="cover">
-    <div class="cover-img"></div>
-    <div class="cover-content">
-        <div class="cover-label">Social Data Analysis and Visualization · Assignment 1 · 2026</div>
-        <h1>Crime in <em>San Francisco</em><br>2003–2025</h1>
-        <p class="cover-desc">
-            An analysis of reported crime incidents across two decades, 
-            seven crime types, and eleven police districts.
-        </p>
-        <div class="cover-authors">[Your names here]</div>
+<!-- ══════════ HEADER ══════════ -->
+<header>
+  <div class="header-inner">
+    <p class="header-eyebrow">Social Data Analysis and Visualization · Assignment 1 · 2026</p>
+    <h1>Crime in <em>San Francisco</em><br>2003–2025</h1>
+    <p class="header-sub">An analysis of reported crime incidents across two decades, nine crime categories, and eleven police districts.</p>
+    <div class="authors">
+      <div class="author-chip">Marah Marak <span>S182946</span></div>
+      <div class="author-chip">Sara Sterlie <span>S204674</span></div>
+      <div class="author-chip">Thorsteinn Mar Hoskuldsson <span>S253555</span></div>
     </div>
-</div>
+  </div>
+</header>
 
-<!-- NAV -->
+<!-- ══════════ NAV ══════════ -->
 <nav>
-    <a href="#intro">Introduction</a>
-    <a href="#temporal">1.1 Temporal</a>
-    <a href="#districts">1.2 Districts</a>
-    <a href="#distributions">1.3 Distributions</a>
+  <ul>
+    <li><a href="#intro">Dataset</a></li>
+    <li><a href="#temporal">1.1 Temporal</a></li>
+    <li><a href="#districts">1.2 Districts</a></li>
+    <li><a href="#distributions">1.3 Distributions</a></li>
+    <li><a href="#spatial">1.4 Spatial</a></li>
+    <li><a href="#regression">1.5 Regression</a></li>
+  </ul>
 </nav>
 
-<!-- CONTENT -->
-<div class="content">
+<!-- ══════════ MAIN ══════════ -->
+<main>
 
-    <!-- INTRO -->
-    <div class="section" id="intro">
-        <div class="section-tag">Introduction</div>
-        <h2>The Dataset</h2>
+  <!-- INTRO -->
+  <section id="intro" class="section">
+    <p class="section-label">The Dataset</p>
+    <h2>San Francisco Police Reports</h2>
+    <p class="section-intro">This analysis draws on two public datasets published by the San Francisco Police Department on the SF Open Data Portal: historical incident reports from 2003 to May 2018, and incident reports from 2018 to the present.</p>
 
-        <p>
-            This analysis draws on two public datasets published by the San Francisco Police Department 
-            on the SF Open Data Portal: historical incident reports from 2003 to May 2018, and incident 
-            reports from 2018 to the present. After merging and standardizing the two datasets, the 
-            combined record spans <strong>22 years</strong> of reported crime across all police districts in the city.
-        </p>
-
-        <p>From this combined dataset, we selected seven Personal Focus Crimes:</p>
-
-        <div class="crimes-list">
-            <span class="crime-tag">Assault</span>
-            <span class="crime-tag">Vehicle Theft</span>
-            <span class="crime-tag">Drug Offences</span>
-            <span class="crime-tag">Burglary</span>
-            <span class="crime-tag">Robbery</span>
-            <span class="crime-tag">Suspicious</span>
-            <span class="crime-tag">Sex Offence</span>
-        </div>
-
-        <p>
-            These crimes were chosen to capture a broad variety of crime types — violent, property-based, 
-            and enforcement-driven — so that contrasting trends across categories can reveal something 
-            meaningful about how social and policy changes shape the city's crime landscape over time.
-        </p>
+    <div class="analysis">
+      <p>After merging and standardizing the two datasets, the combined record spans <strong>22 years</strong> of reported crime across all police districts in the city. Our focused subset covers police reports from 2003 to the present day.</p>
+      <p>From this combined dataset, we selected nine <strong>Personal Focus Crimes</strong> to capture a broad variety of crime types — violent, property-based, and enforcement-driven — so that contrasting trends across categories can reveal something meaningful about how social and policy changes shape the city's crime landscape over time.</p>
     </div>
 
-    <hr>
+    <div class="crime-tags">
+      <span class="crime-tag">assault</span>
+      <span class="crime-tag">burglary</span>
+      <span class="crime-tag">drug offences</span>
+      <span class="crime-tag">vehicle theft</span>
+      <span class="crime-tag">disorderly conduct</span>
+      <span class="crime-tag">suspicious</span>
+      <span class="crime-tag">vandalism</span>
+      <span class="crime-tag">robbery</span>
+      <span class="crime-tag">sex offence</span>
+    </div>
+  </section>
 
-    <!-- 1.1 -->
-    <div class="section" id="temporal">
-        <div class="section-tag">Assignment 1.1</div>
-        <h2>Temporal Overview</h2>
+  <hr class="section-rule" />
 
-        <div class="question">
-            For each Personal Focus Crime, plot the total number of incidents per year from 2003 to 2025. 
-            Identify and describe at least two notable features — trends, anomalies, or turning points — 
-            and offer an explanation for each.
-        </div>
+  <!-- 1.1 TEMPORAL -->
+  <section id="temporal" class="section">
+    <p class="section-label">Assignment 1.1</p>
+    <h2>Temporal Overview</h2>
+    <p class="section-intro">We visualize the total number of incidents per year across the nine selected focus categories from 2003 to 2025, excluding the current year because the data is incomplete.</p>
 
-        <div class="figure">
-            <div class="figure-placeholder">
-                <span>📈</span>
-                <span>Figure 1 — Yearly crime counts by category (2003–2025)</span>
-                <span style="font-size:11px; opacity:0.6">Replace with: &lt;img src="assets/temporal.png"&gt;</span>
-            </div>
-            <div class="figure-caption">
-                <strong>Figure 1.</strong> Annual incident counts for all seven focus crimes from 2003 to 2025. 
-                Each line represents one crime category. Note the diverging trajectories around 2020 and the 
-                drug offence pattern in 2021–2024.
-            </div>
-        </div>
-
-        <p>
-            Looking across the full 22-year period, the most striking signal is the impact of the 
-            COVID-19 pandemic around 2020, which pushed different crime types in sharply opposite directions.
-        </p>
-
-        <p>
-            <strong>Assault dropped noticeably in 2020.</strong> COVID restrictions limited nightlife, 
-            public gatherings, and face-to-face interactions, removing many of the everyday situations 
-            that lead to interpersonal violence.
-        </p>
-
-        <p>
-            <strong>Burglary and vehicle theft moved in the opposite direction.</strong> Empty buildings, 
-            reduced street activity, and the economic stress of the pandemic all created more opportunities 
-            for property crime. This divergence — violent crime down, property crime up — was a pattern 
-            documented in many cities during the pandemic period.
-        </p>
-
-        <p>
-            <strong>Drug offences tell a longer story.</strong> They declined steadily from around 2009 
-            until the pandemic, driven by a shift toward treatment over arrest for low-level possession. 
-            By 2024, however, recorded drug offences rose above pre-pandemic levels as San Francisco 
-            increased enforcement in response to the visible fentanyl crisis. In 2024, the mayor signed 
-            legislation allowing police to transport drug users directly to treatment facilities.
-        </p>
-
-        <p>
-            <strong>Robbery shows a steady long-term decline</strong> across the entire period. 
-            The shift toward cashless payments, widespread smartphone tracking, and increased 
-            surveillance have reduced both the opportunity and payoff of robbery over two decades — 
-            a trend that continued even during periods of wider social disruption.
-        </p>
+    <div class="figure-box">
+      <div class="fig-placeholder">
+        <span class="fig-icon">📈</span>
+        <span>Figure 1 — Yearly crime counts by category (2003–2025)</span>
+        <span style="font-size:12px; opacity:0.7;">Replace with: &lt;img src="assets/temporal.png"&gt;</span>
+      </div>
+      <p class="fig-caption"><strong>Figure 1.1.</strong> Annual incident counts for all nine focus crimes from 2003 to 2025. Each line represents one crime category.</p>
     </div>
 
-    <hr>
+    <div class="analysis">
+      <p>Figure 1.1 gives insight into how different social, political and societal changes impact the rates of recorded crimes. We explore different explanations to the most significant trends and changes.</p>
 
-    <!-- 1.2 -->
-    <div class="section" id="districts">
-        <div class="section-tag">Assignment 1.2</div>
-        <h2>Crime Profiles by Police District</h2>
+      <h4>1) Drop in assault during COVID</h4>
+      <p>There is a noticeable drop in recorded assault offences around 2019–2020. During this time, restrictions, the public mood and fear of contamination, limited nightlife, big gatherings and overall face-to-face interaction. This meant fewer opportunities for interpersonal violence, which is clearly reflected in the data.</p>
 
-        <div class="question">
-            For each police district, compute the conditional crime profile ratio 
-            r(crime, district) = P(crime | district) / P(crime). A value above 1 means 
-            that crime type is over-represented in that district relative to the city-wide average. 
-            Visualize these ratios and describe one district whose profile stands out.
-        </div>
+      <h4>2) Surge in burglaries and vehicle theft during COVID</h4>
+      <p>During the COVID years (2019–2021), the data shows an opposite, but just as noticeable, change — a surge in recorded vehicle thefts and burglaries. Empty buildings, reduced street activity, and longer periods of parked vehicles created more opportunities for property crime. Additionally, COVID was a time of increased economic stress, which likely also contributed to this rise.</p>
 
-        <div class="figure">
-            <div class="figure-placeholder">
-                <span>🗺️</span>
-                <span>Figure 2 — Crime profile ratios by police district</span>
-                <span style="font-size:11px; opacity:0.6">Replace with: &lt;img src="assets/districts.png"&gt;</span>
-            </div>
-            <div class="figure-caption">
-                <strong>Figure 2.</strong> Heatmap of crime profile ratios r(crime, district) for all 11 SF police 
-                districts. Green = over-represented relative to city average (ratio &gt; 1); orange = 
-                under-represented (ratio &lt; 1). A value of 1.0 is exactly the city-wide average. 
-                Rows are sorted by each district's dominant crime type.
-            </div>
-        </div>
+      <h4>3) Recent rise in drug offences</h4>
+      <p>Drug offences declined steadily for most of the timeline until around the pandemic period in 2019. This long-term decrease can be explained by a general change in attitude towards drug use, where enforcement and arrest were reduced and replaced by diversion and treatment. By 2024, however, the data shows a surge in drug offences, rising above pre-pandemic levels. In 2024, the mayor signed legislation allowing police to arrest drug users and send them to reset centers, reflecting a change in policy and enforcement focus in response to public pressure tied to highly visible drug markets.</p>
+    </div>
+  </section>
 
-        <p>
-            Each cell shows how common a crime is in a given district relative to the city-wide average. 
-            A value of 1.0 means exactly average; 2.0 means twice as common; 0.5 means half as common. 
-            This normalization allows fair comparison across districts of very different sizes and 
-            total crime volumes.
-        </p>
+  <hr class="section-rule" />
 
-        <p>
-            <strong>The Tenderloin stands out immediately</strong>, with a drug offences ratio of 3.28 — 
-            meaning drug crime is more than three times as common there compared to the city average. 
-            At the same time, vehicle theft is heavily under-represented (0.25), which makes sense 
-            given that the Tenderloin is a dense, pedestrian-heavy neighborhood with few privately 
-            parked vehicles. The city declared a state of emergency in the Tenderloin in late 2021 
-            in response to overdose deaths and open-air drug markets — and this data confirms that 
-            picture with striking clarity.
-        </p>
+  <!-- 1.2 DISTRICTS -->
+  <section id="districts" class="section">
+    <p class="section-label">Assignment 1.2</p>
+    <h2>Crime Profiles by District</h2>
+    <p class="section-intro">We calculate the conditional crime profile ratios for each police district. This shows which types of crimes are more or less common in each district compared to the city average.</p>
 
-        <p>
-            <strong>Out of SF</strong> shows elevated vehicle theft (2.04) and sex offences (1.86), 
-            likely reflecting incidents near highways or city boundaries where cars are more vulnerable. 
-            <strong>Richmond</strong> and <strong>Taraval</strong> both have elevated burglary ratios 
-            (1.42 and 1.24) — quieter residential western neighborhoods with more homes and shops to 
-            burglarize but far less street-level drug activity. <strong>Central</strong> and 
-            <strong>Northern</strong> show profiles close to 1.0 across most categories, reflecting 
-            their mixed tourist and commercial character.
-        </p>
+    <div class="figure-box">
+      <div class="fig-placeholder">
+        <span class="fig-icon">🗺️</span>
+        <span>Figure 2 — Crime profile ratios by police district</span>
+        <span style="font-size:12px; opacity:0.7;">Replace with: &lt;img src="assets/districts.png"&gt;</span>
+      </div>
+      <p class="fig-caption"><strong>Figure 1.2.</strong> Heatmap showing crime profile ratios r(crime, district) for all SF police districts. Green (values &gt; 1) = over-represented; red (values &lt; 1) = under-represented relative to the city-wide average. Rows sorted by each district's dominant crime type.</p>
     </div>
 
-    <hr>
+    <div class="analysis">
+      <p>The heatmap shows the ratio <em>r(crime, district) = P(crime | district) / P(crime)</em> for each combination of police district and crime category. A value of 1.0 means the crime occurs at exactly the city-wide average rate; values above 1 indicate over-representation and values below 1 indicate under-representation.</p>
 
-    <!-- 1.3 -->
-    <div class="section" id="distributions">
-        <div class="section-tag">Assignment 1.3</div>
-        <h2>Visualizing Distributions</h2>
+      <h4>Tenderloin</h4>
+      <p>The most striking district in the entire heatmap. It has a drug offences ratio of <strong>3.28</strong> — meaning drug crime is more than three times as common there compared to the city average. At the same time, vehicle theft is heavily under-represented (0.25), which makes sense given that the Tenderloin is a dense, pedestrian-heavy neighborhood with fewer privately parked vehicles. The Tenderloin has long been the center of San Francisco's open-air drug market, and this data confirms that pattern clearly.</p>
 
-        <div class="question">
-            Recreate several classic plot types from DAOST Chapter 2 using your crime data. 
-            Part A: a jitter plot of incident times within a single hour. 
-            Part B: a QQ plot of latitude distributions. 
-            Part C: box plots of time-of-day for all focus crimes side by side.
-        </div>
+      <h4>Out of SF</h4>
+      <p>Stands out for vehicle theft (2.04) and sex offences (1.86), while having very low burglary (0.27) and assault (0.60). The high vehicle theft ratio likely reflects that incidents near highways or city boundaries — where cars are more vulnerable and less monitored — are logged under this category.</p>
 
-        <h3>Part A — Jitter Plot</h3>
+      <h4>Richmond and Taraval</h4>
+      <p>Both show elevated burglary ratios (1.42 and 1.24 respectively) and low drug offences (0.30 and 0.31). These are quieter, residential western neighborhoods with more houses and shops to burglarize, but far less street-level drug activity than central districts.</p>
 
-        <div class="figure">
-            <div class="figure-placeholder">
-                <span>⠿</span>
-                <span>Figure 3 — Jitter plot: assault 13:00–14:00 (Jan–Mar 2015)</span>
-                <span style="font-size:11px; opacity:0.6">Replace with: &lt;img src="assets/jitter.png"&gt;</span>
-            </div>
-            <div class="figure-caption">
-                <strong>Figure 3.</strong> Each dot represents one recorded assault incident between 13:00 and 14:00 
-                over January–March 2015. The x-axis shows the minute within the hour; vertical position is 
-                random jitter added only to separate overlapping points and carries no meaning.
-            </div>
-        </div>
+      <h4>Central and Northern</h4>
+      <p>Show relatively balanced profiles close to 1.0 across most categories, suggesting they reflect the city-wide average reasonably well — unsurprising given their central location covering mixed-use tourist and commercial areas.</p>
 
-        <p>
-            The most striking pattern is a large cluster of incidents at <strong>minute 0</strong> — 
-            far larger than any other minute — indicating that officers frequently round the incident 
-            time to the nearest full hour when filing their report. A smaller but visible cluster also 
-            appears at <strong>minute 30</strong>, consistent with rounding to the half hour.
-        </p>
+      <div class="callout">
+        Overall, the heatmap reveals that crime in San Francisco is far from uniformly distributed. Each district has a distinct signature shaped by its geography, land use, and socioeconomic conditions.
+      </div>
+    </div>
+  </section>
 
-        <p>
-            This reveals an important limitation of the data: recorded times should not be treated 
-            as exact measurements. For broad hourly patterns this is manageable, but any fine-grained 
-            sub-hour analysis would produce misleading results.
-        </p>
+  <hr class="section-rule" />
 
-        <h3>Part B — QQ Plot</h3>
+  <!-- 1.3 DISTRIBUTIONS -->
+  <section id="distributions" class="section">
+    <p class="section-label">Assignment 1.3</p>
+    <h2>Visualizing Distributions</h2>
+    <p class="section-intro">We recreate classic plot types from DAOST Chapter 2 using our crime data, examining time recording patterns, geographic distributions, and time-of-day activity.</p>
 
-        <div class="figure">
-            <div class="figure-placeholder">
-                <span>〰</span>
-                <span>Figure 4 — QQ plots of latitude distributions</span>
-                <span style="font-size:11px; opacity:0.6">Replace with: &lt;img src="assets/qqplot.png"&gt; — pending lat/long data</span>
-            </div>
-            <div class="figure-caption">
-                <strong>Figure 4.</strong> Probability plots comparing the latitude distribution of two focus crimes 
-                against a normal reference distribution. Points on the diagonal indicate a perfect normal 
-                distribution; deviations reveal geographic clustering.
-            </div>
-        </div>
-
-        <h3>Part C — Time-of-Day Box Plots</h3>
-
-        <div class="figure">
-            <div class="figure-placeholder">
-                <span>◫</span>
-                <span>Figure 5 — Time-of-day distributions by crime type</span>
-                <span style="font-size:11px; opacity:0.6">Replace with: &lt;img src="assets/boxplot.png"&gt;</span>
-            </div>
-            <div class="figure-caption">
-                <strong>Figure 5.</strong> Box plots showing the distribution of incident hour for each of the seven 
-                focus crimes side by side. The y-axis runs from 00:00 to 24:00. Crimes that peak near midnight 
-                may suffer from wrap-around distortion in this representation.
-            </div>
-        </div>
-
+    <div class="analysis">
+      <h3>Part A — Jitter Plot</h3>
+      <p>To investigate how incident times are recorded in the dataset, we selected assault as our focus crime and filtered incidents occurring between 13:00–14:00 over a three-month period (January–March 2015).</p>
     </div>
 
-</div>
+    <div class="figure-box">
+      <div class="fig-placeholder">
+        <span class="fig-icon">⠿</span>
+        <span>Figure 3 — Jitter plot: assault 13:00–14:00 (Jan–Mar 2015)</span>
+        <span style="font-size:12px; opacity:0.7;">Replace with: &lt;img src="assets/jitter.png"&gt;</span>
+      </div>
+      <p class="fig-caption"><strong>Figure 1.3.</strong> Jitter plot showing recorded times for assault incidents between 13:00–14:00 (January–March 2015). Each dot represents a single recorded incident. The pronounced spike at minute 0 and smaller cluster at minute 30 indicate systematic rounding of incident times to the nearest hour or half-hour.</p>
+    </div>
 
-<!-- FOOTER -->
+    <div class="analysis">
+      <p>In Figure 1.3, each dot represents a single recorded incident, with the x-axis showing the minute within the hour and the points spread out vertically to avoid overlap. The big cluster at minute 0 shows more incidents logged exactly on the hour than at any other minute. A smaller cluster sits at minute 30 as well.</p>
+      <p>The most likely reason is that officers round the time when writing up their report rather than recording the exact minute. What this means in practice is that the recorded times can't be taken at face value — any analysis that tries to pinpoint exact minutes would be reading too much into the data.</p>
+
+      <h3>Part B — QQ Plot</h3>
+      <p>To examine the geographic distribution of crime across the city, we created QQ plots comparing the latitude distribution of two focus crimes — assault and vehicle theft — against a normal (Gaussian) reference distribution.</p>
+    </div>
+
+    <div class="figure-box">
+      <div class="fig-placeholder">
+        <span class="fig-icon">〰</span>
+        <span>Figure 4 — QQ plots of latitude distributions</span>
+        <span style="font-size:12px; opacity:0.7;">Replace with: &lt;img src="assets/qqplot.png"&gt;</span>
+      </div>
+      <p class="fig-caption"><strong>Figure 1.4.</strong> Q-Q plots comparing the latitude distribution of assault and vehicle theft incidents against a theoretical normal distribution. The red diagonal line represents a perfect normal distribution.</p>
+    </div>
+
+    <div class="analysis">
+      <p>In Figure 1.4, we see that both plots follow the reference line reasonably well in the middle, suggesting that the bulk of incidents are distributed fairly symmetrically across the north-south span of San Francisco. However, both plots show clear deviations at the tails — points flatten out and cluster around specific latitude values, indicating that incidents concentrate in particular areas rather than spreading evenly.</p>
+      <p>The S-shaped curve visible in both plots is a classic sign of a distribution with lighter tails than a normal distribution. We notice that both assault and vehicle theft show almost identical QQ plot shapes, suggesting their geographic distributions are very similar despite being very different types of crime.</p>
+
+      <h3>Part C — Box Plots of Time-of-Day</h3>
+      <p>To examine when different crimes occur throughout the day, we extracted the hour of each incident and created side-by-side box plots for all nine focus crimes.</p>
+    </div>
+
+    <div class="figure-box">
+      <div class="fig-placeholder">
+        <span class="fig-icon">◫</span>
+        <span>Figure 5 — Time-of-day distributions by crime type</span>
+        <span style="font-size:12px; opacity:0.7;">Replace with: &lt;img src="assets/boxplot.png"&gt;</span>
+      </div>
+      <p class="fig-caption"><strong>Figure 1.5.</strong> Box plots showing the time-of-day distribution for each of the nine focus crimes. The box spans the interquartile range, the line inside is the median, and the whiskers extend to min/max recorded times.</p>
+    </div>
+
+    <div class="analysis">
+      <p>In Figure 1.5 we see how all nine crime categories are distributed across the day. All of them occur predominantly between 06:00 and 18:00, suggesting that the majority of reported crimes in San Francisco happen during daylight hours regardless of crime type.</p>
+      <p><strong>Drug offences</strong> show the tightest distribution, with a median at around 15:00 and a box spanning roughly 12:00 to 18:00. This narrow spread indicates that drug-related incidents are strongly concentrated in the afternoon.</p>
+      <p><strong>Sex offence</strong>, on the other hand, has a median around 12:00 but the widest box of all categories, stretching from roughly 03:00 to 18:00, reflecting that sex offences are recorded across almost every hour of the day.</p>
+      <div class="callout">
+        <strong>Key limitation:</strong> The midnight wrap-around problem. Crimes like assault and sex offence genuinely occur at night, but because the clock resets at 00:00, incidents at 23:00 and 01:00 are treated as being 22 hours apart rather than 2. A circular time representation or 24-hour polar plot would handle this more honestly.
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-rule" />
+
+  <!-- 1.4 SPATIAL -->
+  <section id="spatial" class="section">
+    <p class="section-label">Assignment 1.4</p>
+    <h2>Spatial Power Law</h2>
+    <p class="section-intro">We look at the spatial distribution of crime to uncover whether crime is evenly distributed throughout the city, or concentrated in only a few hotspots. We define a grid overlay, count crimes in each cell, and analyse the frequency distribution.</p>
+
+    <div class="analysis">
+      <p>We first identified the most common crime from our focus group: <strong>assault</strong> — the highest-incident category. We then defined a <strong>100m × 100m grid</strong> to cover the entire area of San Francisco and counted assault incidents per cell.</p>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-value">22</div>
+        <div class="stat-label">Mean assaults per grid cell</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">6</div>
+        <div class="stat-label">Median assaults per cell</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">3,032</div>
+        <div class="stat-label">Max in a single cell</div>
+      </div>
+    </div>
+
+    <div class="figure-box">
+      <div class="fig-placeholder">
+        <span class="fig-icon">⬛</span>
+        <span>Figure 6 — Frequency distribution N(k) on linear and log-log scales</span>
+        <span style="font-size:12px; opacity:0.7;">Replace with: &lt;img src="assets/powerlaw.png"&gt;</span>
+      </div>
+      <p class="fig-caption"><strong>Figure 1.6.</strong> The frequency distribution N(k) plotted against number of crimes k. Left: linear axes. Right: log-log axes. The straight line on the log-log plot reveals a power law distribution.</p>
+    </div>
+
+    <div class="analysis">
+      <h4>Power Law Distribution</h4>
+      <p>Figure 1.6 provides strong visual evidence for a <strong>power law distribution</strong>:</p>
+      <p>On <strong>linear scales</strong>, the distribution is crushed along the axes. Most values lie in the low end, meanwhile there is a heavy tail with only very few values over larger counts.</p>
+      <p>On <strong>log-log scales</strong>, the power law distribution becomes clear. Values fall approximately along a straight line over a range of counts.</p>
+
+      <h4>Implications for neighborhood-level statistics</h4>
+      <p>Assault incidents follow a power-law distribution and are spatially concentrated in a small number of grid cells. Because crime is heavily concentrated in a few hotspots, the average number of crimes per grid cell becomes misleading.</p>
+      <p>The gap between the mean (22) and the median (6) tells us that most grid cells have assault counts well below the average. The mean is inflated by a small number of high-crime hotspots. In fact, the grid with the most crimes has 3,032 recordings.</p>
+      <div class="callout">
+        When we average the number of crimes on a neighborhood level, it has a misleading effect: the city appears moderately dangerous on average, but in reality it consists of mostly safe neighborhoods with only a few areas of very high crime concentration.
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-rule" />
+
+  <!-- 1.5 REGRESSION -->
+  <section id="regression" class="section">
+    <p class="section-label">Assignment 1.5</p>
+    <h2>Regression and Correlation</h2>
+    <p class="section-intro">For each crime type, we compute a 168-dimensional vector (one count per hour of the week, Monday 00:00 to Sunday 23:00), then compare all pairwise combinations using closed-form linear regression and R².</p>
+
+    <div class="figure-box">
+      <div class="fig-placeholder">
+        <span class="fig-icon">⬛</span>
+        <span>Figure 7 — Pairwise regression matrix (36 combinations)</span>
+        <span style="font-size:12px; opacity:0.7;">Replace with: &lt;img src="assets/regression.png"&gt;</span>
+      </div>
+      <p class="fig-caption"><strong>Figure 1.7.</strong> Pairwise scatterplot matrix for all 36 crime-pair combinations (9 focus crimes × 168 hourly points). Colors encode temporal progression through the week; red lines are closed-form linear fits; panel labels report R². Green border marks the most correlated pair; orange border marks the least correlated pair.</p>
+    </div>
+
+    <div class="analysis">
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-value" style="font-size:1.2rem; color:#a8e0b8;">Vehicle theft<br>vs Vandalism</div>
+          <div class="stat-label">Most correlated — R² ≈ 0.848</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="font-size:1.2rem; color:#e8a090;">Disorderly conduct<br>vs Robbery</div>
+          <div class="stat-label">Least correlated — R² ≈ 0.004</div>
+        </div>
+      </div>
+
+      <p>The <strong>most correlated pair</strong> is vehicle theft vs vandalism with R² ≈ 0.848. This suggests a strong shared weekly rhythm, which makes sense because both are property-related crimes often tied to similar conditions: traffic patterns, parking behavior, and nighttime/weekend activity.</p>
+      <p>The <strong>least correlated pair</strong> is disorderly conduct vs robbery with R² ≈ 0.004, indicating almost no linear alignment in their weekly patterns. Disorderly conduct is often linked to local street-level disturbances and enforcement context, while robbery can be driven by different situational opportunities and victim/offender dynamics.</p>
+      <p>Overall, the regression matrix shows that some crime categories appear to move together across the week, while others are effectively out of sync. This supports the idea that different crime types are generated by different social factors and local conditions, even within the same city and time period.</p>
+    </div>
+  </section>
+
+  <hr class="section-rule" />
+
+  <!-- CONTRIBUTIONS -->
+  <section class="section">
+    <p class="section-label">Group</p>
+    <h2>Contributions</h2>
+
+    <table class="contrib-table">
+      <thead>
+        <tr>
+          <th>Name / Student nr.</th>
+          <th>Contributions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Marah Marak / <code>S182946</code></td>
+          <td>1.2 and 1.5</td>
+        </tr>
+        <tr>
+          <td>Sara Sterlie / <code>S204674</code></td>
+          <td>1.1 and 1.4</td>
+        </tr>
+        <tr>
+          <td>Thorsteinn Mar Hoskuldsson / <code>S253555</code></td>
+          <td>1.5</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- REFERENCES -->
+  <div class="references">
+    <h2>References</h2>
+    <ol>
+      <li>City and County of San Francisco (2025). <em>Police Department Incident Reports: Historical 2003 to May 2018.</em> DataSF. Available at: <a href="https://data.sfgov.org/d/tmnf-yvry" target="_blank">https://data.sfgov.org/d/tmnf-yvry</a> (Accessed: 27 February 2026).</li>
+      <li>City and County of San Francisco (2025). <em>Police Department Incident Reports: 2018 to present.</em> DataSF. Available at: <a href="https://data.sfgov.org/d/tmnf-yvry" target="_blank">https://data.sfgov.org/d/tmnf-yvry</a> (Accessed: 27 February 2026).</li>
+      <li>San Francisco Chronicle. <em>Tracking San Francisco's drug overdose epidemic.</em> Available at: <a href="https://www.sfchronicle.com/projects/san-francisco-drug-overdose-deaths/" target="_blank">sfchronicle.com</a> (Accessed: 27 February 2026).</li>
+      <li>Pena, L. (2026). <em>SF mayor signs legislation for officers to arrest drug users, send them to reset center.</em> ABC7 San Francisco. Available at: <a href="https://abc7news.com/post/san-francisco-mayor-signs-legislation-police-sheriff-deputies-arrest-drug-users-send-reset-center/18613975/" target="_blank">abc7news.com</a> (Accessed: 25 February 2026).</li>
+    </ol>
+  </div>
+
+</main>
+
 <footer>
-    <p>Social Data Analysis and Visualization — Assignment 1 · 2026</p>
-    <p><span>[Your group members here]</span></p>
+  Social Data Analysis and Visualization — Assignment 1 · 2026 &nbsp;·&nbsp; DTU Course 02806
 </footer>
 
 </body>
